@@ -1,34 +1,51 @@
 from socketIO_client import SocketIO, LoggingNamespace
-#from camera import VideoCamera
-import cv2
+import cv2, time
 import numpy as np
 
-#def grab_frame(camera):
-#    frame = camera.get_frame()
-#    return (b'--frame\r\n'
-#            b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n').encode('base64')
-
-#def video_feed():
-#    return grab_frame(VideoCamera())
 
 def on_frame_response(args):
     print('frame response:', args['data'])
 
 
-socketIO = SocketIO('localhost', 8000, LoggingNamespace)
-socketIO.on('frame_ack', on_frame_response)
+def main():
+    # generate the client name. If none can be produced from the client's file, then
+    # use a timestamp 
+    client_name = ""
+    try:
+        with open("client_file.txt", 'r') as f:
+            list = f.readlines()
+            client_name = list[0]
+    except:
+        client_name = str(time.time())
+        with open("client_file.txt", 'w') as f:
+            f.write(client_name)
 
-video = cv2.VideoCapture(0)
-while True:
-    success, image = video.read()
-    ret, jpeg = cv2.imencode('.jpg', image)
-
-    nparr = np.fromstring(jpeg, np.uint8)
-    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    print("Booting Client " + client_name)
     
 
-    args = { 'frame' : jpeg.tobytes().encode('base64') }
-    print("emission")
+    # main event loop sends packets until connection is lost
+    # at which point it blocks polling for the socket
+    while True:
+        try: 
+            socketIO = SocketIO('localhost', 8000, LoggingNamespace)
+            socketIO.on('frame_ack', on_frame_response)
+        except:
+            continue
 
-    socketIO.emit('frame', args)
-    socketIO.wait(seconds=1)
+        video = cv2.VideoCapture(0)
+        while True:
+            success, image = video.read()
+            ret, jpeg = cv2.imencode('.jpg', image)
+            
+            args = { 'frame' : jpeg.tobytes().encode('base64'), 'sender' : client_name }
+            print("emission")
+            
+            try:
+                socketIO.emit('frame', args)
+                socketIO.wait(seconds=.1)
+            except:
+                break
+
+
+if __name__ == '__main__':
+    main()
