@@ -28,12 +28,13 @@ def handle_frame(args):
     emit("frame_ack", { 'data' : 'Thank You!'} ) #can get rid of this once done debugging
 
     # logging
-    if (client_name in settings.logs_table):
-        settings.logs_table[client_name].write(img)
+    if (client_name in settings.logs_map):
+        settings.logs_map[client_name].write(img)
     else:
         height , width , layers =  img.shape
-        settings.logs_table[client_name] = cv2.VideoWriter('logs/' + client_name + '.avi',-1,1,(width,height))
-        settings.logs_table[client_name].write(img)
+        settings.logs_map[client_name] = cv2.VideoWriter('logs/' + client_name + '.avi',-1,1,(width,height))
+        settings.logs_map[client_name].write(img)
+        #TODO: will probably need to make sure to run the following on exit. Or we can just scrap these parts of the logs
         #cv2.destroyAllWindows()
         #video.release()
 
