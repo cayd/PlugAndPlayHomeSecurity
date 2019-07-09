@@ -1,6 +1,6 @@
 from cam_socket import run_cam_socket
 from web_server import run_web_server
-import settings 
+import settings.settings as settings
 
 from threading import Thread, Lock
 

@@ -2,7 +2,7 @@ from flask import Flask, render_template, Response, send_from_directory, url_for
 from camera import VideoCamera
 import numpy as np
 import cv2, os, datetime
-import settings
+import settings.settings as settings
 
 app = Flask(__name__)
 

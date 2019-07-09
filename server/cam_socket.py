@@ -5,7 +5,7 @@ import numpy as np
 import cv2, os, datetime
 from threading import Thread
 
-import settings
+import settings.settings as settings
 
 app = Flask(__name__)
 socketio = SocketIO(app, async_handlers=True)
@@ -28,13 +28,12 @@ def handle_frame(args):
     emit("frame_ack", { 'data' : 'Thank You!'} ) #can get rid of this once done debugging
 
     # logging
-    global logs_table, last_log
-    if (client_name in logs_table):
-        logs_table[client_name].write(img)
+    if (client_name in settings.logs_table):
+        settings.logs_table[client_name].write(img)
     else:
         height , width , layers =  img.shape
-        logs_table[client_name] = cv2.VideoWriter('logs/' + client_name + '.avi',-1,1,(width,height))
-        logs_table[client_name].write(img)
+        settings.logs_table[client_name] = cv2.VideoWriter('logs/' + client_name + '.avi',-1,1,(width,height))
+        settings.logs_table[client_name].write(img)
         #cv2.destroyAllWindows()
         #video.release()
 
@@ -42,11 +41,7 @@ def handle_frame(args):
     #if datetime.datetime.now() > last_log + timedelta(minutes=1):
 
 
+#p is a port number. it is typically passed in from the command line
 def run_cam_socket(p=8001):
-    #set up data structures for logging
-    global logs_table, last_log
-    logs_table = {  }
-    last_log = datetime.datetime.now()
-
     #run the server
     socketio.run(app, host='0.0.0.0', debug=False, port=p)
