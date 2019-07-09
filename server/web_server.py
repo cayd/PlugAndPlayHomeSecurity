@@ -31,9 +31,9 @@ def server_feed():
 
 def gen_client(stream_id):
     while True:
-        settings.img_lock.acquire()
+        settings.locks_map[stream_id].acquire()
         file = cv2.imread('static/' + stream_id + '_frame.jpg',0)
-        settings.img_lock.release()
+        settings.locks_map[stream_id].release()
         ret, jpeg = cv2.imencode('.jpg', file)
         frame = jpeg.tobytes()
         yield (b'--frame\r\n'

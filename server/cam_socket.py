@@ -3,7 +3,7 @@ from flask_socketio import SocketIO, emit
 from camera import VideoCamera
 import numpy as np
 import cv2, os, datetime
-from threading import Thread
+from threading import Thread, Lock
 
 import settings.settings as settings
 
@@ -21,9 +21,14 @@ def handle_frame(args):
     nparr = np.fromstring(client_frame, np.uint8)
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
     
-    settings.img_lock.acquire()
+    try:
+        settings.locks_map[client_name].acquire()
+    except:
+        settings.locks_map[client_name] = Lock()
+        settings.locks_map[client_name].acquire()
+
     cv2.imwrite('static/' + client_name  + '_frame.jpg',img)
-    settings.img_lock.release()
+    settings.locks_map[client_name].release()
 
     emit("frame_ack", { 'data' : 'Thank You!'} ) #can get rid of this once done debugging
 
