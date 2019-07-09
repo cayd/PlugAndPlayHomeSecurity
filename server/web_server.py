@@ -2,7 +2,7 @@ from flask import Flask, render_template, Response, send_from_directory, url_for
 from camera import VideoCamera
 import numpy as np
 import cv2, os, datetime
-
+import settings
 
 app = Flask(__name__)
 
@@ -31,7 +31,9 @@ def server_feed():
 
 def gen_client(stream_id):
     while True:
+        settings.img_lock.acquire()
         file = cv2.imread('static/' + stream_id + '_frame.jpg',0)
+        settings.img_lock.release()
         ret, jpeg = cv2.imencode('.jpg', file)
         frame = jpeg.tobytes()
         yield (b'--frame\r\n'
@@ -40,7 +42,7 @@ def gen_client(stream_id):
 
 # stream_id should match with a client name. if that is not the case, then we default to 
 # the server feed 
-#TODO: default should be all streams chosen for the dashboard by the authenticated user
+#TODO: default should be changed to all streams chosen for the dashboard by the authenticated user
 @app.route('/client_feed')
 def client_feed():
     try:

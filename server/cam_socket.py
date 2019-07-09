@@ -5,6 +5,8 @@ import numpy as np
 import cv2, os, datetime
 from threading import Thread
 
+import settings
+
 app = Flask(__name__)
 socketio = SocketIO(app, async_handlers=True)
 
@@ -18,7 +20,10 @@ def handle_frame(args):
     # image conversion from bytes
     nparr = np.fromstring(client_frame, np.uint8)
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    
+    settings.img_lock.acquire()
     cv2.imwrite('static/' + client_name  + '_frame.jpg',img)
+    settings.img_lock.release()
 
     emit("frame_ack", { 'data' : 'Thank You!'} ) #can get rid of this once done debugging
 

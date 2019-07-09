@@ -1,13 +1,14 @@
 from cam_socket import run_cam_socket
 from web_server import run_web_server
+import settings 
 
-from threading import Thread
+from threading import Thread, Lock
 
 
 def main():
-    Thread(target=run_cam_socket, kwargs=dict(p=8001)).start() 
+    settings.init()
     Thread(target=run_web_server).start()
-
+    Thread(target=run_cam_socket, kwargs=dict(p=8001)).start() 
 
 if __name__ == '__main__':
     main()
