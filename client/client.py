@@ -24,7 +24,7 @@ def main():
         client_name = str(time.time())        
         args = { 'sender' : client_name }
 
-        socketIO = SocketIO('http://boingoreg.ngrok.io')
+socketIO = SocketIO('http://boingoreg.ngrok.io')
         socketIO.on('registration_ack', on_frame_response)
         socketIO.emit('registration_request', args)
 
@@ -38,7 +38,7 @@ def main():
     # at which point it blocks polling for the socket
     #while True:
     #try: 
-    socketIO = SocketIO('http://boingocam.ngrok.io')#'http://boingocam.ngrok.io'
+socketIO = SocketIO('http://boingocam.ngrok.io')#'http://boingocam.ngrok.io'
     socketIO.on('frame_ack', on_frame_response)
     #except:
     #    continue
