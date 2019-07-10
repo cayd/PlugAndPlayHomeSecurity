@@ -10,6 +10,21 @@ import settings.settings as settings
 app = Flask(__name__)
 socketio = SocketIO(app, async_handlers=True)
 
+# args: name of the intended log feed, 
+#       img0 first image of the feed. used for sizing
+# returns: a log feed
+def make_log_feed(name, img0):
+    codec = cv2.VideoWriter_fourcc('D','I','V','X')
+    print(codec)
+    
+    #size = (int(img0.get(cv2.CAP_PROP_FRAME_WIDTH)),
+    #        int(img0.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+    h, w, _ = img0.shape
+    print(w, h)
+    videoFile = cv2.VideoWriter();
+    videoFile.open(name, codec, 25, (w,h), 1)
+    return videoFile
+
 @socketio.on('frame')
 def handle_frame(args):
     client_frame=args['frame'].decode('base64')
@@ -20,7 +35,7 @@ def handle_frame(args):
     # image conversion from bytes
     nparr = np.fromstring(client_frame, np.uint8)
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-    
+
     try:
         settings.locks_map[client_name].acquire()
     except:
@@ -37,21 +52,20 @@ def handle_frame(args):
         print("writing img")
         settings.logs_map[client_name].write(img)
     else:
-        height , width , layers =  img.shape
-        settings.logs_map[client_name] = cv2.VideoWriter('logs/' + client_name + '.avi',-1,1,(width,height))
+        settings.logs_map[client_name] = make_log_feed('logs/'+client_name+'_'+ str(datetime.datetime.now().isoformat())+'.avi', img) 
         settings.logs_map[client_name].write(img)
-        #TODO: will probably need to make sure to run the following on exit. Or we can just scrap these parts of the logs
-        #cv2.destroyAllWindows()
-        #video.release()
 
-    # if more than a minute has passed since the last logging, dump the log
-    if datetime.datetime.now() > settings.last_log + datetime.timedelta(seconds=10):
+
+    # if more than a minute has passed since the last logging, write out the log
+    if datetime.datetime.now() > settings.last_log + datetime.timedelta(minutes=1):
         print("dumping logs out now")
         print(settings.logs_map)
         for name, log in settings.logs_map.items():
             cv2.destroyAllWindows()
             log.release()
             settings.last_log = datetime.datetime.now()
+            settings.logs_map[client_name] = make_log_feed('logs/'+client_name+'_'+ str(datetime.datetime.now().isoformat())+'.avi', img)
+            settings.logs_map[client_name].write(img)
 
 #p is a port number. it is typically passed in from the command line
 def run_cam_socket(p=8002):
