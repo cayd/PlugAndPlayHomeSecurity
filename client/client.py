@@ -17,15 +17,14 @@ def main():
     try:
         with open("client_file.txt", 'r') as f:
             list = f.readlines()
-            client_name = list[0].strip()#list[0].split(',')[0].strip()
-            #port = list[0].split(',')[1].strip()
+            client_name = list[0].strip()
     except:
         #register a new client
         print("registering as a new client")
         client_name = str(time.time())        
         args = { 'sender' : client_name }
 
-        socketIO = SocketIO('localhost', 8001, LoggingNamespace)
+        socketIO = SocketIO('http://boingoreg.ngrok.io')
         socketIO.on('registration_ack', on_frame_response)
         socketIO.emit('registration_request', args)
 
@@ -39,8 +38,7 @@ def main():
     # at which point it blocks polling for the socket
     #while True:
     #try: 
-    port = 8002
-    socketIO = SocketIO('http://localhost', int(port), LoggingNamespace)
+    socketIO = SocketIO('http://boingocam.ngrok.io')#'http://boingocam.ngrok.io'
     socketIO.on('frame_ack', on_frame_response)
     #except:
     #    continue
@@ -48,6 +46,9 @@ def main():
     video = cv2.VideoCapture(0)
     while True:
         success, image = video.read()
+        if not success:
+            continue
+
         ret, jpeg = cv2.imencode('.jpg', image)
         
         args = { 'frame' : jpeg.tobytes().encode('base64'), 'sender' : client_name } 

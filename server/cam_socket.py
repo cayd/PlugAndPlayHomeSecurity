@@ -17,13 +17,12 @@ def make_log_feed(name, img0):
     codec = cv2.VideoWriter_fourcc('D','I','V','X')
     print(codec)
     
-    #size = (int(img0.get(cv2.CAP_PROP_FRAME_WIDTH)),
-    #        int(img0.get(cv2.CAP_PROP_FRAME_HEIGHT)))
     h, w, _ = img0.shape
     print(w, h)
     videoFile = cv2.VideoWriter();
     videoFile.open(name, codec, 25, (w,h), 1)
     return videoFile
+
 
 @socketio.on('frame')
 def handle_frame(args):

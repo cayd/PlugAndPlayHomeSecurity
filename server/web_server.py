@@ -45,9 +45,12 @@ def gen_client(stream_id):
 #TODO: default should be changed to all streams chosen for the dashboard by the authenticated user
 @app.route('/client_feed')
 def client_feed():
+    #if user not in settings.authenticated_user_list:
+    #    return "can't view, log in first"
     try:
         stream_id=request.args['stream_id']
-        if not os.path.isfile('static/' + stream_id + '_frame.jpg'):
+        if not (os.path.isfile('static/' + stream_id + '_frame.jpg') and 
+                stream_id in settings.locks_map):
             raise Exception("not a valid stream_id. default to server feed")
         return Response(gen_client(stream_id),
                         mimetype='multipart/x-mixed-replace; boundary=frame')
@@ -58,4 +61,3 @@ def client_feed():
 def run_web_server():    
     #run the server
     app.run(host='0.0.0.0', debug=False, port=8000)
-
