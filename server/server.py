@@ -12,9 +12,9 @@ def main():
     Thread(target=run_registration_server).start()
 
     #start threads for each of the clients that are in the settings file
-    for id, port in settings.ports_map.items():
-        print(id, port)
-        Thread(target=run_cam_socket, kwargs=dict(p=port)).start()
+    #for id, port in settings.ports_map.items():
+    #print(id, port)
+    Thread(target=run_cam_socket, kwargs=dict(p=8002)).start()
         
 
 if __name__ == '__main__':

@@ -7,37 +7,30 @@ def on_frame_response(args):
     print('frame response:', args['data'])
 
 def on_registration_response(args):
-    print('registration response:', args['port'])
-    global port
-    port = args['port']
+    print('registration response:', args)
+
 
 def main():
     # generate the client name. If none can be produced from the client's file, then
     # use a timestamp 
     client_name = ""
-    global port
-    port = 8002
     try:
         with open("client_file.txt", 'r') as f:
             list = f.readlines()
-            client_name = list[0].split(',')[0].strip()
-            port = list[0].split(',')[1].strip()
+            client_name = list[0].strip()#list[0].split(',')[0].strip()
+            #port = list[0].split(',')[1].strip()
     except:
         #register a new client
-        client_name = str(time.time())
-        
+        print("registering as a new client")
+        client_name = str(time.time())        
         args = { 'sender' : client_name }
 
         socketIO = SocketIO('localhost', 8001, LoggingNamespace)
         socketIO.on('registration_ack', on_frame_response)
-        socketIO.emit('registtration_request', args)
-
-        # block until the port is defined 
-        while port is None:
-            continue
+        socketIO.emit('registration_request', args)
 
         with open("client_file.txt", 'w') as f:
-            f.write(client_name+','+str(port))
+            f.write(client_name)
 
     print("Booting Client " + client_name)
     
