@@ -10,7 +10,7 @@ def return_registration(stream_id):
     print("received registration request")
     #port = settings.next_available_port()
     with open('settings/client_list.txt', 'a') as f:
-        f.write(str(stream_id))
+        f.write(str(stream_id['sender'])+',')
     emit("registration_ack", { 'data' : 'thanks!' } )
 
 

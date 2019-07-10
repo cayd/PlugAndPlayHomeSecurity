@@ -34,6 +34,7 @@ def handle_frame(args):
 
     # logging
     if (client_name in settings.logs_map):
+        print("writing img")
         settings.logs_map[client_name].write(img)
     else:
         height , width , layers =  img.shape
@@ -44,10 +45,15 @@ def handle_frame(args):
         #video.release()
 
     # if more than a minute has passed since the last logging, dump the log
-    #if datetime.datetime.now() > last_log + timedelta(minutes=1):
-
+    if datetime.datetime.now() > settings.last_log + datetime.timedelta(seconds=10):
+        print("dumping logs out now")
+        print(settings.logs_map)
+        for name, log in settings.logs_map.items():
+            cv2.destroyAllWindows()
+            log.release()
+            settings.last_log = datetime.datetime.now()
 
 #p is a port number. it is typically passed in from the command line
-def run_cam_socket(p=8001):
+def run_cam_socket(p=8002):
     #run the server
     socketio.run(app, host='0.0.0.0', debug=False, port=p)
