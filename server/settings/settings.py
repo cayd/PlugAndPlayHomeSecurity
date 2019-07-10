@@ -13,6 +13,9 @@ def init():
     global last_log
     last_log = datetime.datetime.now()
 
+    global authenticated_users_list
+    authenticated_users_list = []
+
 
 #def next_available_port():
 #    global ports_map

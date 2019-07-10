@@ -40,7 +40,7 @@ def main():
     #while True:
     #try: 
     port = 8002
-    socketIO = SocketIO('localhost', int(port), LoggingNamespace)
+    socketIO = SocketIO('http://localhost', int(port), LoggingNamespace)
     socketIO.on('frame_ack', on_frame_response)
     #except:
     #    continue
@@ -55,7 +55,7 @@ def main():
             
         #try:
         socketIO.emit('frame', args)
-        socketIO.wait(seconds=.1)
+        socketIO.wait(seconds=.5)
         #except:
         #    break
 
