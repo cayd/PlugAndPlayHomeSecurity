@@ -56,7 +56,7 @@ def main():
             
         #try:
         socketIO.emit('frame', args)
-        socketIO.wait(seconds=.5)
+        socketIO.wait(seconds=.1)
         #except:
         #    break
 

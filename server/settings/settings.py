@@ -23,13 +23,16 @@ def init():
             line=i.split(',')
             users_map[line[0].strip()] = line[1].strip()
 
-#def next_available_port():
-#    global ports_map
-#    
-#    largest_port = -1
-#    for name, port in ports_map.items():
-#        if port > largest_port:
-#            largest_port = port
-#
-#    return largest_port
+    global feeds
+    feeds=[]
+
+def next_available_port():
+    global ports_map
+    
+    largest_port = -1
+    for name, port in ports_map.items():
+        if port > largest_port:
+            largest_port = port
+
+    return largest_port
     

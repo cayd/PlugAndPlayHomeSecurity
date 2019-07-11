@@ -10,7 +10,6 @@ app = Flask(__name__)
 def login_page():
     error = None
     if request.method == 'POST':
-        #if request.form['username'] != 'admin' or request.form['password'] != 'admin':
         if not (request.form['username'] in settings.users_map and settings.users_map[request.form['username']] == request.form['password']):
             error = 'Invalid Credentials. Please try again.'
         else:
@@ -48,15 +47,13 @@ def stream_selector():
 @app.route("/register_device")
 def register():
     return render_template("register.html")
-    #return "A download will start on your computer. Just run the executable once completed"
 
 @app.route("/Boingo-Cam-Mac.app")
 def DownloadLogFile():
-    #try:
-    return send_file("settings/Boingo-Cam-Mac.app", as_attachment=True)
-    #except Exception as e:
-    #    self.log.exception(e)
-    #    self.Error(400)
+    #for file in os.listdir('settings/Boingo-Cam-Mac.app'):
+    #    send_file(file)
+    return send_file("settings/Boingo-Cam-Mac.zip", as_attachment=True)
+
 
 def gen(camera):
     while True:
@@ -84,25 +81,34 @@ def gen_client(stream_id):
 # the server feed 
 #TODO: default should be changed to all streams chosen for the dashboard by the authenticated user
 @app.route('/show_clients')
-def show_clients(stream_id=None):
+def show_clients(stream_id=""):
     #if user not in settings.authenticated_user_list:
     #    return "can't view, log in first"
     print("s_id", stream_id)
-    try:
+    #try:
         #stream_id=request.args['stream_id']
-        if not (os.path.isfile('static/' + stream_id + '_frame.jpg') and 
-                stream_id in settings.locks_map):
-            raise Exception("not a valid stream_id. default to server feed")
-        return Response(gen_client(stream_id),
+    if settings.feeds:
+        stream = settings.feeds.pop(0)
+        return Response(gen_client(stream),
                         mimetype='multipart/x-mixed-replace; boundary=frame')
-    except: 
-        return server_feed()
+    
+
+    if not (os.path.isfile('static/' + stream_id + '_frame.jpg') and 
+            stream_id in settings.locks_map):
+        raise Exception("not a valid stream_id. " + str(stream_id) + " default to server feed")
+    return Response(gen_client(stream_id),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+    #except: 
+    #    return server_feed()
         
 def find_all_feeds():
     feeds = []
     for i in settings.locks_map:
-        feeds.append(i)
+        if not i == "":
+            feeds.append(i)
     print("feeds", feeds)
+    
+    settings.feeds=feeds
     return feeds
 
 @app.route('/client_feed')

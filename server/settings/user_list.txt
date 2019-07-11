@@ -1,0 +1,8 @@
+be,password
+mf,password
+dl,password
+dp,password
+ph,password
+bc,password
+mr,password
+admin,password
