@@ -49,11 +49,15 @@ def register():
     return render_template("register.html")
 
 @app.route("/Boingo-Cam-Mac.app")
-def DownloadLogFile():
+def download_mac():
     #for file in os.listdir('settings/Boingo-Cam-Mac.app'):
     #    send_file(file)
-    return send_file("settings/Boingo-Cam-Mac.zip", as_attachment=True)
+    return send_file("../client/client.py", as_attachment=True)
+    return send_file("settings/Boingo-Cam-Mac", as_attachment=True)
 
+@app.route("/Boingo-Cam-Win.app")
+def download_win():
+    return send_file("settings/Boingo-Cam-Win.zip", as_attachment=True)
 
 def gen(camera):
     while True:
@@ -79,7 +83,6 @@ def gen_client(stream_id):
 
 # stream_id should match with a client name. if that is not the case, then we default to 
 # the server feed 
-#TODO: default should be changed to all streams chosen for the dashboard by the authenticated user
 @app.route('/show_clients')
 def show_clients(stream_id=""):
     #if user not in settings.authenticated_user_list:
