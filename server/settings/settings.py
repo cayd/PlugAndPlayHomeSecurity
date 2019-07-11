@@ -13,9 +13,15 @@ def init():
     global last_log
     last_log = datetime.datetime.now()
 
-    global authenticated_users_list
-    authenticated_users_list = []
-
+    global users_map
+    users_map = { }
+    #print("hi")
+    with open('settings/user_list.txt', 'r') as f:
+        lines=f.readlines()
+        #print('lines', lines)
+        for i in lines:
+            line=i.split(',')
+            users_map[line[0].strip()] = line[1].strip()
 
 #def next_available_port():
 #    global ports_map
